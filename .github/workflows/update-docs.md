@@ -39,31 +39,37 @@ The documentation is written primarily in **Japanese**. You must write all docum
 
 ## Your Task
 
-1. **Identify what changed**: Examine the pushed commit(s) that triggered this workflow. Determine which source files under `src/` were added, modified, or deleted.
+1. **Scan the entire source code**: Read all source files under `src/` to understand the current state of the codebase — pages, components, hooks, utilities, API routes, and type definitions.
 
-2. **Analyze the impact on docs**: For each change, determine which documentation files under `docs/` need to be updated. Consider:
-   - New pages or routes → update `docs/architecture/directory-structure.md`, `docs/features/`, or `docs/development/adding-new-page.md`
-   - New or modified components → update `docs/development/ui-components.md` or relevant feature docs
-   - API changes (new endpoints, modified responses) → update `docs/api/`
-   - Type definition changes → update `docs/api/types.md`
-   - New hooks or utilities → update `docs/development/`
-   - Data flow changes → update `docs/architecture/data-flow.md`
+2. **Audit all documentation**: Compare every documentation file under `docs/` against the actual source code. For each doc file, check whether it accurately reflects the current codebase:
+   - `docs/architecture/` — Does it match the actual directory structure, tech stack, and data flow?
+   - `docs/features/` — Does each feature doc accurately describe the current implementation?
+   - `docs/api/` — Are all API routes, endpoints, and types documented and up to date?
+   - `docs/development/` — Are developer guides (setup, conventions, UI components, adding pages/charts) consistent with the code?
+   - `docs/deployment/` — Are deployment guides still accurate?
+   - `docs/getting-started/` — Are installation, configuration, and quick-start guides correct?
+   - `docs/contributing/` — Are contribution guidelines consistent with the project?
 
-3. **Generate documentation updates**: Write clear, accurate documentation updates that reflect the code changes. Follow the existing documentation style:
+3. **Identify gaps and inaccuracies**: Determine what is outdated, missing, or incorrect. This includes:
+   - Documented features or APIs that no longer exist
+   - Source code features or components that are not yet documented
+   - Descriptions that do not match the current implementation
+
+4. **Generate documentation updates**: Write clear, accurate documentation that reflects the current state of the source code. Follow the existing documentation style:
    - Use Markdown format with consistent heading hierarchy (H1 for titles, H2 for sections)
    - Write in **Japanese** to match existing docs
    - Be concise and structural — use heading-driven organization
    - Focus on "what" and "how"
 
-4. **Submit a pull request**: Create a pull request with the documentation updates using the `create-pull-request` safe output.
+5. **Submit a pull request**: Create a pull request with the documentation updates using the `create-pull-request` safe output.
 
 ## Guidelines
 
-- **Only update docs that are affected by the code changes.** Do not rewrite unrelated documentation.
+- **Audit all docs against the full source code**, not just the files changed in the triggering commit.
 - **Preserve the existing documentation structure and style.** Match the tone, format, and language (Japanese) of surrounding content.
-- **If a code change has no documentation impact** (e.g., minor refactoring, formatting, typo fixes), call the `noop` safe output explaining that no documentation update is needed.
-- **Be precise**: Documentation should accurately reflect the current state of the code after the changes.
-- **Keep changes minimal**: Only add, modify, or remove the specific sections affected by the code change.
+- **If all documentation is already accurate and complete**, call the `noop` safe output explaining that no updates are needed.
+- **Be precise**: Documentation should accurately reflect the current state of the code.
+- **Keep changes minimal**: Only add, modify, or remove the specific sections that are outdated, missing, or incorrect. Do not rewrite sections that are already accurate.
 - **When adding new feature docs**, follow the pattern of existing feature documentation files.
 
 ## Safe Outputs

@@ -9,7 +9,8 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "Copilot Metrics Dashboard",
-  description: "GitHub Copilot usage metrics dashboard for your organization",
+  description:
+    "GitHub Copilot usage metrics dashboard for your organization",
 };
 
 export default function RootLayout({
