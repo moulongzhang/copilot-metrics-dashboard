@@ -126,6 +126,20 @@ src/
 - **API Routes** (`src/app/api/`) proxy requests to the GitHub REST API, keeping the token server-side.
 - **Client Components** (charts, tables) receive data as props and render interactive visualizations.
 
+## Documentation
+
+詳細なドキュメントは [`docs/`](./docs/) ディレクトリを参照してください。
+
+| カテゴリ | 内容 |
+|---|---|
+| [Getting Started](./docs/getting-started/) | インストール、環境変数設定、クイックスタート |
+| [Architecture](./docs/architecture/) | アーキテクチャ全体像、データフロー、ディレクトリ構成 |
+| [Features](./docs/features/) | 各ダッシュボードページの機能説明 |
+| [API Reference](./docs/api/) | GitHub API エンドポイント、内部 API ルート、型定義 |
+| [Development](./docs/development/) | 開発環境、コーディング規約、ページ/チャート追加ガイド |
+| [Deployment](./docs/deployment/) | Vercel / Docker デプロイ手順 |
+| [Contributing](./docs/contributing/) | コントリビューションガイド、行動規範 |
+
 ## License
 
 MIT
