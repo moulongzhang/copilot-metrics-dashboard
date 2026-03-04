@@ -104,6 +104,8 @@ src/lib/
 ├── types.ts           # GitHub API レスポンス型・集計型の定義
 ├── github.ts          # GitHub REST API クライアント関数
 ├── copilot-client.ts  # @github/copilot-sdk ラッパー（チャット用）
+├── chat-tools.ts      # AI チャット用ツール定義（get_seat_info 等）
+├── tool-logger.ts     # ツール実行ログ（tool-execution.log への記録）
 ├── constants.ts       # カラーパレット・ナビゲーション定数
 └── utils.ts           # cn() ユーティリティ（clsx + tailwind-merge）
 ```
