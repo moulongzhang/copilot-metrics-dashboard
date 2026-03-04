@@ -5,6 +5,7 @@
 | メソッド | エンドポイント | 関数名 | 用途 |
 |---------|--------------|--------|------|
 | GET | `/orgs/{org}/copilot/metrics` | `fetchOrgMetrics` | 日次 Copilot メトリクス |
+| GET | `/orgs/{org}/team/{teamSlug}/copilot/metrics` | `fetchTeamMetrics` | チーム別 Copilot メトリクス |
 | GET | `/orgs/{org}/copilot/metrics/reports/organization-28-day/latest` | `fetchOrgUsageReport` | 直近28日の組織利用レポートリンク |
 | GET | `/orgs/{org}/copilot/metrics/reports/organization-1-day?day={YYYY-MM-DD}` | `fetchOrgUsageReport(day)` | 特定日の組織利用レポートリンク |
 | GET | `/orgs/{org}/copilot/metrics/reports/users-28-day/latest` | `fetchUserUsageReport` | 直近28日のユーザー別利用レポートリンク |

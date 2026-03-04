@@ -30,6 +30,7 @@ Next.js Server (App Router)
 | 関数 | エンドポイント | 用途 |
 |------|--------------|------|
 | `fetchOrgMetrics` | `GET /orgs/{org}/copilot/metrics` | 日次メトリクス (GA API) |
+| `fetchTeamMetrics` | `GET /orgs/{org}/team/{teamSlug}/copilot/metrics` | チーム別メトリクス (GA API) |
 | `fetchOrgUsageReport` | `GET /orgs/{org}/copilot/metrics/reports/organization-{N}-day/...` | 組織利用レポートのダウンロードリンク取得 |
 | `fetchUserUsageReport` | `GET /orgs/{org}/copilot/metrics/reports/users-{N}-day/...` | ユーザー別利用レポートのダウンロードリンク取得 |
 | `downloadAndParseNDJSON` | 上記で得たダウンロード URL | NDJSON テキストを行ごとにパース |

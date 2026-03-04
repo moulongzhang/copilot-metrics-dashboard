@@ -10,6 +10,7 @@
 | GET | `/api/usage-reports/org` | `src/app/api/usage-reports/org/route.ts` | 組織利用レポート |
 | GET | `/api/usage-reports/users` | `src/app/api/usage-reports/users/route.ts` | ユーザー別利用レポート |
 | POST | `/api/copilot-chat` | `src/app/api/copilot-chat/route.ts` | AI チャット (SSE ストリーミング) |
+| GET | `/api/tool-logs` | `src/app/api/tool-logs/route.ts` | AI ツール実行ログ取得 |
 
 ## 各ルートのリクエスト/レスポンス仕様
 
@@ -62,6 +63,16 @@ data: {"type":"delta","content":"<text chunk>"}
 
 data: {"type":"done"}
 ```
+
+### GET /api/tool-logs
+
+| パラメータ | 型 | 説明 |
+|-----------|----|------|
+| `limit` | number | 取得件数（デフォルト: 50） |
+
+レスポンス: `ToolLogEntry[]`（新しい順）
+
+`Cache-Control: no-store`（キャッシュ無効）
 
 ## キャッシュ制御（Cache-Control ヘッダー）
 
