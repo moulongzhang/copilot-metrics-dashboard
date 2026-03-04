@@ -1,132 +1,130 @@
 # Copilot Metrics Dashboard
 
-A web dashboard for visualizing GitHub Copilot usage metrics for your organization. Built with Next.js, TypeScript, Recharts, and Tailwind CSS.
+組織の GitHub Copilot 利用状況を可視化する Web ダッシュボードです。Next.js、TypeScript、Recharts、Tailwind CSS で構築されています。
 
-<!-- 組織の GitHub Copilot 利用状況を可視化するダッシュボードです。 -->
+## 機能
 
-## Features
+- **組織概要**: 日次アクティブユーザー/エンゲージユーザー、機能採用トレンド
+- **コード補完**: 言語別・エディタ別の提案数、受け入れ数、受け入れ率
+- **チャット分析**: IDE チャットと GitHub.com チャットのメトリクス、チャットモード別の内訳
+- **プルリクエスト**: リポジトリ別の PR サマリーメトリクス
+- **メンバーメトリクス**: ユーザー毎の利用状況の内訳（検索・ソート機能付き）
 
-- **Organization Overview**: Daily active/engaged users, feature adoption trends
-- **Code Completions**: Suggestions, acceptances, acceptance rates by language and editor
-- **Chat Analytics**: IDE Chat and GitHub.com Chat metrics, chat modes breakdown
-- **Pull Requests**: PR summary metrics by repository
-- **Member Metrics**: Per-user usage breakdown with search and sort
+## 前提条件
 
-## Prerequisites
-
-- Node.js 18+
+- Node.js 18 以上
 - npm
-- GitHub Personal Access Token with appropriate permissions (see below)
+- 適切な権限を持つ GitHub Personal Access Token（後述）
 
-## Setup
+## セットアップ
 
-1. Clone the repository:
+1. リポジトリをクローンします:
    ```bash
    git clone <repository-url>
    cd copilot-metrics-dashboard
    ```
-2. Install dependencies:
+2. 依存関係をインストールします:
    ```bash
    npm install
    ```
-3. Copy `.env.local.example` to `.env.local`:
+3. `.env.local.example` を `.env.local` にコピーします:
    ```bash
    cp .env.local.example .env.local
    ```
-4. Edit `.env.local` and set your GitHub token and organization name.
-5. Run the development server:
+4. `.env.local` を編集して、GitHub トークンと組織名を設定します。
+5. 開発サーバーを起動します:
    ```bash
    npm run dev
    ```
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+6. ブラウザで [http://localhost:3000](http://localhost:3000) を開きます。
 
-## Environment Variables
+## 環境変数
 
-| Variable | Required | Description |
+| 変数名 | 必須 | 説明 |
 |---|---|---|
-| `GITHUB_TOKEN` | Yes | GitHub Personal Access Token |
-| `GITHUB_ORG` | Yes | Target organization slug (default: `octodemo`) |
-| `NEXT_PUBLIC_ORG_NAME` | No | Organization display name for the UI |
+| `GITHUB_TOKEN` | はい | GitHub Personal Access Token |
+| `GITHUB_ORG` | はい | 対象組織のスラッグ（デフォルト: `octodemo`） |
+| `NEXT_PUBLIC_ORG_NAME` | いいえ | UI に表示する組織名 |
 
-## Required Token Permissions
+## 必要なトークン権限
 
 ### Fine-grained PAT
 
-- **Organization Copilot metrics** — read
-- **Members** — read
+- **Organization Copilot metrics** — 読み取り
+- **Members** — 読み取り
 
 ### Classic PAT
 
 - `read:org`
 - `manage_billing:copilot`
 
-## API Endpoints Used
+## 使用する API エンドポイント
 
-The dashboard consumes the following GitHub REST API endpoints:
+このダッシュボードは以下の GitHub REST API エンドポイントを使用します:
 
-| Endpoint | Description |
+| エンドポイント | 説明 |
 |---|---|
-| `GET /orgs/{org}/copilot/metrics` | Copilot usage metrics (daily time-series) |
-| `GET /orgs/{org}/copilot/metrics/reports/organization-1-day` | Organization-level 1-day usage report |
-| `GET /orgs/{org}/copilot/metrics/reports/organization-28-day/latest` | Organization-level 28-day usage report |
-| `GET /orgs/{org}/copilot/metrics/reports/users-1-day` | Per-user 1-day usage report |
-| `GET /orgs/{org}/copilot/metrics/reports/users-28-day/latest` | Per-user 28-day usage report |
-| `GET /orgs/{org}/copilot/billing/seats` | Copilot seat assignments |
-| `GET /orgs/{org}/members` | Organization members list |
+| `GET /orgs/{org}/copilot/metrics` | Copilot 利用メトリクス（日次時系列） |
+| `GET /orgs/{org}/copilot/metrics/reports/organization-1-day` | 組織レベルの 1 日間利用レポート |
+| `GET /orgs/{org}/copilot/metrics/reports/organization-28-day/latest` | 組織レベルの 28 日間利用レポート |
+| `GET /orgs/{org}/copilot/metrics/reports/users-1-day` | ユーザー毎の 1 日間利用レポート |
+| `GET /orgs/{org}/copilot/metrics/reports/users-28-day/latest` | ユーザー毎の 28 日間利用レポート |
+| `GET /orgs/{org}/copilot/billing/seats` | Copilot シート割り当て |
+| `GET /orgs/{org}/members` | 組織メンバーリスト |
 
-## Tech Stack
+## 技術スタック
 
 - **Next.js 15** (App Router, React Server Components)
 - **TypeScript**
-- **Recharts** — chart library
-- **Tailwind CSS** — utility-first styling
-- **shadcn/ui** — UI component primitives (Card, Table, Tabs, Badge, etc.)
-- **Lucide React** — icon library
-- **date-fns** — date utilities
+- **Recharts** — チャートライブラリ
+- **Tailwind CSS** — ユーティリティファーストスタイリング
+- **shadcn/ui** — UI コンポーネントプリミティブ（Card、Table、Tabs、Badge など）
+- **Lucide React** — アイコンライブラリ
+- **date-fns** — 日付ユーティリティ
 
-## Development
+## 開発
 
 ```bash
-npm run dev     # Start development server (http://localhost:3000)
-npm run build   # Production build
-npm run start   # Start production server
-npm run lint    # Run ESLint
+npm run dev     # 開発サーバーを起動 (http://localhost:3000)
+npm run build   # 本番ビルド
+npm run start   # 本番サーバーを起動
+npm run lint    # ESLint を実行
 ```
 
-## Architecture
+## アーキテクチャ
 
 ```
 src/
 ├── app/
-│   ├── api/              # API route handlers (proxy GitHub API calls)
+│   ├── api/              # API ルートハンドラー（GitHub API 呼び出しのプロキシ）
 │   │   ├── members/
 │   │   ├── metrics/
 │   │   ├── seats/
 │   │   └── usage-reports/
-│   ├── chat/             # Chat analytics page
-│   ├── completions/      # Code completions page
-│   ├── members/          # Member metrics page
-│   ├── pull-requests/    # PR metrics page
-│   ├── layout.tsx        # Root layout with sidebar navigation
-│   └── page.tsx          # Organization overview (home)
+│   ├── chat/             # チャット分析ページ
+│   ├── completions/      # コード補完ページ
+│   ├── members/          # メンバーメトリクスページ
+│   ├── pull-requests/    # PR メトリクスページ
+│   ├── layout.tsx        # サイドバーナビゲーション付きルートレイアウト
+│   └── page.tsx          # 組織概要（ホーム）
 ├── components/
-│   ├── cards/            # Metric summary cards
-│   ├── charts/           # Recharts-based chart components
-│   ├── layout/           # Header, Sidebar
-│   ├── tables/           # Data tables (members)
-│   └── ui/               # shadcn/ui primitives
+│   ├── cards/            # メトリクスサマリーカード
+│   ├── charts/           # Recharts ベースのチャートコンポーネント
+│   ├── layout/           # Header、Sidebar
+│   ├── tables/           # データテーブル（メンバー）
+│   └── ui/               # shadcn/ui プリミティブ
 └── lib/
-    ├── github.ts         # GitHub API client functions
-    ├── types.ts          # TypeScript type definitions
-    ├── constants.ts      # App constants
-    └── utils.ts          # Utility functions
+    ├── github.ts         # GitHub API クライアント関数
+    ├── types.ts          # TypeScript 型定義
+    ├── constants.ts      # アプリ定数
+    └── utils.ts          # ユーティリティ関数
 ```
 
-- **Server Components** (pages) fetch data from internal API routes at render time.
-- **API Routes** (`src/app/api/`) proxy requests to the GitHub REST API, keeping the token server-side.
-- **Client Components** (charts, tables) receive data as props and render interactive visualizations.
+- **Server Components**（ページ）はレンダリング時に内部 API ルートからデータを取得します。
+- **API Routes**（`src/app/api/`）は GitHub REST API へのリクエストをプロキシし、トークンをサーバーサイドに保持します。
+- **Client Components**（チャート、テーブル）はデータを props として受け取り、インタラクティブな可視化をレンダリングします。
 
-## Documentation
+## ドキュメント
 
 詳細なドキュメントは [`docs/`](./docs/) ディレクトリを参照してください。
 
@@ -140,6 +138,6 @@ src/
 | [Deployment](./docs/deployment/) | Vercel / Docker デプロイ手順 |
 | [Contributing](./docs/contributing/) | コントリビューションガイド、行動規範 |
 
-## License
+## ライセンス
 
 MIT
