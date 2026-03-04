@@ -1,0 +1,21 @@
+{
+    "timestamp": "2026-03-04T10:13:30.806Z",
+    "sessionId": "683e4346-14ae-4719-8cf7-4bdc1f7aeafd",
+    "toolName": "get_user_metrics",
+    "args": {
+        "user_login": "moulongzhang"
+    },
+    "result": {
+        "status": "success",
+        "summary": "## User Metrics (1 users)\n\n| User | Days | Interactions | Code Gen | Accepted | Rate | LOC Added | Agent | Chat |\n|------|------|-------------|----------|----------|------|-----------|-------|------|\n"
+    },
+    "usage": {
+        "model": "claude-sonnet-4.6",
+        "inputTokens": 16417,
+        "outputTokens": 101,
+        "cost": 1,
+        "premiumRequestsUsed": 0,
+        "premiumRequestsRemaining": -1,
+        "remainingPercentage": 100
+    }
+}

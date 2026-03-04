@@ -132,6 +132,24 @@ export async function fetchUserUsageData(): Promise<UserUsageRecord[]> {
   return downloadAndParseNDJSON<UserUsageRecord>(report.download_links);
 }
 
+// Fetch team-level Copilot metrics
+export async function fetchTeamMetrics(
+  teamSlug: string,
+  since?: string,
+  until?: string,
+): Promise<CopilotMetricsDay[]> {
+  const org = getOrg();
+  const params = new URLSearchParams();
+  if (since) params.set('since', since);
+  if (until) params.set('until', until);
+  params.set('per_page', '28');
+
+  const url = `${GITHUB_API_BASE}/orgs/${org}/team/${teamSlug}/copilot/metrics?${params}`;
+  const res = await fetch(url, { headers: getHeaders(), next: { revalidate: 3600 } });
+  if (!res.ok) throw new Error(`GitHub API error: ${res.status} ${res.statusText}`);
+  return res.json();
+}
+
 // Fetch all org members with pagination
 export async function fetchAllMembers(): Promise<OrgMember[]> {
   const org = getOrg();

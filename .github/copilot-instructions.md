@@ -3,9 +3,9 @@
 ## Build & Run
 
 ```bash
-npm run dev        # Dev server at http://localhost:3000
-npm run build      # Production build
-npm run lint       # ESLint (flat config, next/core-web-vitals + next/typescript)
+npm run dev      # Start dev server at http://localhost:3000
+npm run build    # Production build
+npm run lint     # ESLint (Next.js core-web-vitals + typescript configs)
 ```
 
 No test framework is configured.
@@ -16,20 +16,49 @@ Requires `.env.local` with `GITHUB_TOKEN`, `GITHUB_ORG`, and optionally `NEXT_PU
 
 ## Architecture
 
-Next.js App Router dashboard that visualizes GitHub Copilot usage metrics for an organization. Data flows through three layers:
+This is a Next.js 16 App Router dashboard that visualizes GitHub Copilot usage metrics for an organization.
 
-1. **`src/lib/github.ts`** — GitHub REST API client. Uses raw `fetch` with token auth and API version header (`2022-11-28`). Handles pagination manually and parses NDJSON download streams via `downloadAndParseNDJSON<T>()`. Fetches use `next: { revalidate: 3600 }` for ISR.
+### Data flow
 
-2. **`src/app/api/`** — Thin proxy routes that call `lib/github` functions, add `Cache-Control` headers, and return JSON. These keep the token server-side.
+1. **Pages** (React Server Components) call functions from `src/lib/github.ts` to fetch data at render time
+2. `src/lib/github.ts` calls the GitHub REST API directly using the server-side `GITHUB_TOKEN`
+3. **API routes** (`src/app/api/`) also proxy GitHub API requests — used by client-side components (e.g., the chat panel)
+4. All pages use `export const dynamic = 'force-dynamic'` to disable static generation
 
-3. **`src/app/*/page.tsx`** — Async React Server Components that import `lib/github` functions directly, aggregate/transform data, and pass pre-formatted arrays to client components. All pages use `export const dynamic = 'force-dynamic'`.
+### Copilot SDK chat integration
+
+`src/components/ChatPanel.tsx` is a client component that streams chat responses via SSE from `/api/copilot-chat`. The API route uses `@github/copilot-sdk` with `getOrCreateSession` and streams `delta` events back. The SDK is listed in `serverExternalPackages` in `next.config.ts`.
 
 ## Key Conventions
 
-- **Server vs. Client split**: Pages are Server Components that do data fetching and transformation. Charts and interactive UI are Client Components (`"use client"`) that receive display-ready props — they never fetch data.
-- **UI stack**: shadcn/ui (new-york style) + Tailwind CSS v4 + Recharts + Lucide icons. Add new shadcn components via `npx shadcn@latest add <component>`.
-- **Type definitions**: All GitHub API response types live in `src/lib/types.ts`, structured to match the nested shape of the actual API responses.
-- **Naming**: `fetchXxx()` for API client functions in `lib/github.ts`. Chart components are `XxxChart`, cards are `XxxCard` or `MetricCard`.
-- **Layout**: Root layout uses a fixed `h-screen` 3-column flex: Sidebar | main content | ChatPanel. Sidebar navigation uses `usePathname()` for active state.
-- **Date handling**: Dates flow as `YYYY-MM-DD` strings, formatted only at display time using `date-fns`.
-- **Path aliases**: `@/components`, `@/lib`, `@/hooks`, `@/components/ui` (configured in `tsconfig.json` and `components.json`).
+### Component patterns
+
+- **Pages** are async Server Components that fetch data, compute aggregates, and pass props to child components
+- **Charts** are `"use client"` components using Recharts, wrapped in shadcn Card components, with consistent `h-80` height and empty-state fallbacks
+- **MetricCard** (`src/components/cards/MetricCard.tsx`) is the standard card for displaying a single KPI with optional trend indicator
+
+### shadcn/ui
+
+Uses the **new-york** style with **neutral** base color. Add components via:
+
+```bash
+npx shadcn@latest add <component>
+```
+
+Aliases: `@/components/ui`, `@/lib/utils`, `@/hooks`
+
+### API routes
+
+All GET route handlers follow the same pattern: try/catch, call a `src/lib/github.ts` function, return `NextResponse.json()` with `Cache-Control: public, s-maxage=3600, stale-while-revalidate=600`.
+
+### Styling
+
+Tailwind CSS v4 with `@tailwindcss/postcss`. Use the `cn()` utility from `@/lib/utils` for conditional class merging.
+
+### Types
+
+All GitHub API response types and display-oriented types are defined in `src/lib/types.ts`. API client functions are in `src/lib/github.ts`.
+
+### Navigation
+
+Add new dashboard pages by adding an entry to `NAV_ITEMS` in `src/lib/constants.ts` and creating the corresponding `src/app/<route>/page.tsx`.

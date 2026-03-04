@@ -2,6 +2,8 @@ import { CopilotClient, CopilotSession, approveAll } from "@github/copilot-sdk";
 import { execSync } from "node:child_process";
 import { fetchOrgUsageData } from "./github";
 import { OrgUsageReport } from "./types";
+import { logToolExecution } from "./tool-logger";
+import { createChatTools } from "./chat-tools";
 
 // Singleton CopilotClient managed via globalThis to survive hot reloads
 const globalForCopilot = globalThis as unknown as {
@@ -94,6 +96,18 @@ ${sorted.map((d) => `  ${d.day}: DAU=${d.daily_active_users}, MAU=${d.monthly_ac
 `.trim();
 }
 
+const toolStartTimes = new Map<string, number>();
+
+let latestUsage: {
+  model?: string;
+  inputTokens?: number;
+  outputTokens?: number;
+  cost?: number;
+  premiumRequestsUsed?: number;
+  premiumRequestsRemaining?: number;
+  remainingPercentage?: number;
+} | undefined;
+
 export async function createChatSession(): Promise<{
   session: CopilotSession;
   sessionId: string;
@@ -108,13 +122,64 @@ export async function createChatSession(): Promise<{
     metricsContext = "Metrics data could not be loaded.";
   }
 
+
   const session = await client.createSession({
-    model: "gpt-4.1",
+    model: "claude-sonnet-4.6",
     streaming: true,
     onPermissionRequest: approveAll,
-    systemMessage: {
-      content: `You are a helpful assistant for the GitHub Copilot Metrics Dashboard. Answer questions about the dashboard data and Copilot usage metrics. Below is the current dashboard data:\n\n${metricsContext}\n\nUse this data to answer the user's questions accurately. If the user asks about specific metrics, refer to the data above. Respond concisely and in the same language the user writes in.`,
+    tools: createChatTools(),
+    hooks: {
+      onPreToolUse: (input, invocation) => {
+        const key = input.toolName + "_" + input.timestamp;
+        toolStartTimes.set(key, Date.now());
+        logToolExecution({
+          timestamp: new Date().toISOString(),
+          sessionId: invocation.sessionId,
+          toolName: input.toolName,
+          args: input.toolArgs,
+        });
+        console.log(`[hook] Tool START: ${input.toolName}`);
+        return { permissionDecision: "allow" as const };
+      },
+      onPostToolUse: (input, invocation) => {
+        const key = input.toolName + "_" + input.timestamp;
+        const startTime = toolStartTimes.get(key);
+        const durationMs = startTime ? Date.now() - startTime : undefined;
+        toolStartTimes.delete(key);
+        const status = input.toolResult.resultType === "failure" ? "failure" : "success";
+        const summary = input.toolResult.textResultForLlm.slice(0, 200);
+        logToolExecution({
+          timestamp: new Date().toISOString(),
+          sessionId: invocation.sessionId,
+          toolName: input.toolName,
+          args: input.toolArgs,
+          result: { status, summary },
+          durationMs,
+          usage: latestUsage,
+        });
+        console.log(`[hook] Tool END: ${input.toolName} (${durationMs}ms) [${status}]`);
+        return {};
+      },
     },
+    systemMessage: {
+      content: `You are a helpful assistant for the GitHub Copilot Metrics Dashboard. Answer questions about the dashboard data and Copilot usage metrics. Below is the current dashboard data:\n\n${metricsContext}\n\nYou also have access to tools that can fetch additional data at runtime:\n- get_seat_info: Get Copilot license/seat assignments and activity status\n- get_user_metrics: Get per-user usage metrics (optionally filtered by user_login)\n- get_metrics_by_date_range: Get detailed metrics for a custom date range\n- get_team_metrics: Get metrics scoped to a specific team\n- get_org_members: Get organization member list\n\nUse the pre-loaded data above for general questions. Call tools when the user asks about specific users, teams, date ranges, seats/licenses, or needs data not in the pre-loaded summary. Respond concisely and in the same language the user writes in.`,
+    },
+  });
+
+  session.on("assistant.usage", (event) => {
+    const data = event.data;
+    const quotaKeys = data.quotaSnapshots ? Object.keys(data.quotaSnapshots) : [];
+    const quota = quotaKeys.length > 0 ? data.quotaSnapshots![quotaKeys[0]] : undefined;
+    latestUsage = {
+      model: data.model,
+      inputTokens: data.inputTokens,
+      outputTokens: data.outputTokens,
+      cost: data.cost,
+      premiumRequestsUsed: quota?.usedRequests,
+      premiumRequestsRemaining: quota ? quota.entitlementRequests - quota.usedRequests : undefined,
+      remainingPercentage: quota?.remainingPercentage,
+    };
+    console.log(`[hook] Usage: model=${data.model} cost=${data.cost} tokens=${data.inputTokens}+${data.outputTokens}`);
   });
 
   return { session, sessionId: session.sessionId };
